@@ -1,6 +1,6 @@
-# MTA:SA Script Compiler
+# MTA Resource Lua Compiler
 
-MTA:SA Script Compiler compiles Lua scripts declared by an MTA resource using the official [MTA Lua compilation API](https://wiki.multitheftauto.com/wiki/Lua_compilation_API). It works in Visual Studio Code and Cursor.
+MTA Resource Lua Compiler compiles Lua scripts declared by an MTA resource using the official [MTA Lua compilation API](https://wiki.multitheftauto.com/wiki/Lua_compilation_API). It works in Visual Studio Code and Cursor.
 
 ## What it does
 
@@ -29,7 +29,7 @@ The generated `_compiled` directory is recreated on each run, so it never contai
 
 ## Installation
 
-Install the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/search?term=MTA%20Script%20Compiler&target=VS&vsVersion=vs2022). Cursor supports the same VS Code extension format.
+Install the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/search?term=MTA%20Resource%20Lua%20Compiler&target=VS&vsVersion=vs2022). Cursor supports the same VS Code extension format.
 
 ## Disclaimer
 

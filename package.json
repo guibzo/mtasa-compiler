@@ -6,7 +6,7 @@
     "url": "https://github.com/guibzo/mtasa-compiler"
   },
   "license": "MIT",
-  "icon": "images/mtasa.png",
+  "icon": "images/mtasa-compiler-logo.png",
   "displayName": "MTA Resource Lua Compiler",
   "description": "Compile the Lua scripts declared by an MTA resource from Visual Studio Code or Cursor.",
   "version": "0.1.1",
