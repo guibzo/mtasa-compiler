@@ -1,5 +1,5 @@
 {
-  "name": "mtasa-compile-scripts",
+  "name": "mtasa-resource-script-compiler",
   "publisher": "mtasa-resource-compiler",
   "repository": {
     "type": "git",
