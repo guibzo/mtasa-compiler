@@ -33,4 +33,4 @@ Install the extension from the [Visual Studio Marketplace](https://marketplace.v
 
 ## Disclaimer
 
-Source files are sent directly to the MTA API for compilation and are not stored by this extension. Review the source code before use.
+Source files are sent directly to the MTA API for compilation and are not stored by this extension. Review the [source code](https://github.com/guibzo/mtasa-compiler) before use.

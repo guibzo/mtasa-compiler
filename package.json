@@ -1,6 +1,11 @@
 {
   "name": "mtasa-compile-scripts",
   "publisher": "mtasa-tools",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guibzo/mtasa-compiler"
+  },
+  "license": "MIT",
   "icon": "images/mtasa.png",
   "displayName": "MTA Script Compiler",
   "description": "Compile the Lua scripts declared by an MTA resource from Visual Studio Code or Cursor.",
