@@ -1,0 +1,75 @@
+{
+  "name": "mtasa-compile-scripts",
+  "publisher": "mtasa-tools",
+  "icon": "images/mtasa.png",
+  "displayName": "MTA Script Compiler",
+  "description": "Compile the Lua scripts declared by an MTA resource from Visual Studio Code or Cursor.",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:mta-compile-scripts.run-from-meta",
+    "onCommand:mta-compile-scripts.run-from-lua"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mta-compile-scripts.run-from-meta",
+        "title": "Compile resource"
+      },
+      {
+        "command": "mta-compile-scripts.run-from-lua",
+        "title": "Compile selected script(s)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "mta-compile-scripts.run-from-meta",
+          "group": "navigation",
+          "when": "resourceLangId == xml && resourceFilename =~ /meta\\.xml$/",
+          "title": "Compile resource"
+        },
+        {
+          "command": "mta-compile-scripts.run-from-meta",
+          "group": "navigation",
+          "when": "explorerResourceIsFolder",
+          "title": "Compile resource or folder"
+        },
+        {
+          "command": "mta-compile-scripts.run-from-lua",
+          "group": "navigation",
+          "when": "resourceLangId == lua",
+          "title": "Compile selected script(s)"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.86.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "@vscode/test-cli": "^0.0.6",
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "glob": "^10.3.10",
+    "xml-js": "^1.6.11"
+  }
+}
