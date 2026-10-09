@@ -1,5 +1,6 @@
 import path from "path";
 import * as vscode from "vscode";
+import { CompilerService } from "../services/compiler.service";
 import { FileService } from "../services/file.service";
 import { ResourceCompilerService } from "../services/resource-compiler.service";
 
@@ -14,20 +15,34 @@ type CompilationGroup = {
 
 export function registerCompileCommands(
   context: vscode.ExtensionContext,
-  resourceCompiler = new ResourceCompilerService(),
+  resourceCompiler?: ResourceCompilerService,
   fileService = new FileService(),
 ): void {
+  const compiler = resourceCompiler ?? new ResourceCompilerService(fileService, new CompilerService(getBundledCompilerPath(context.extensionPath)));
   const output = vscode.window.createOutputChannel("MTA Script Compiler");
 
   context.subscriptions.push(
     output,
     vscode.commands.registerCommand(COMPILE_RESOURCE_COMMAND, (...args: unknown[]) =>
-      compileTargets(args, true, resourceCompiler, fileService, output),
+      compileTargets(args, true, compiler, fileService, output),
     ),
     vscode.commands.registerCommand(COMPILE_SELECTION_COMMAND, (...args: unknown[]) =>
-      compileTargets(args, false, resourceCompiler, fileService, output),
+      compileTargets(args, false, compiler, fileService, output),
     ),
   );
+}
+
+function getBundledCompilerPath(extensionPath: string): string | undefined {
+  if (process.platform === "win32") {
+    return path.join(extensionPath, "bin", "win32", "luac_mta.exe");
+  }
+
+  if (process.platform === "linux") {
+    const architecture = process.arch === "x64" ? "x64" : process.arch === "ia32" ? "x86" : undefined;
+    return architecture ? path.join(extensionPath, "bin", `linux-${architecture}`, "luac_mta") : undefined;
+  }
+
+  return undefined;
 }
 
 async function compileTargets(

@@ -9,7 +9,7 @@
   "icon": "images/mtasa-compiler-logo.png",
   "displayName": "MTA Resource Lua Compiler",
   "description": "Compile the Lua scripts declared by an MTA resource from Visual Studio Code or Cursor.",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.86.0"
   },

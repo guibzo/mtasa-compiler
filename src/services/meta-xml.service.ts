@@ -22,11 +22,11 @@ export class MetaXmlService {
 
   async parse(filePath: string): Promise<Element> {
     const content = await this.fileService.readText(filePath);
-    return xml2js(content, { compact: false }) as Element;
+    return xml2js(content, { compact: false, captureSpacesBetweenElements: true }) as Element;
   }
 
   getScriptEntries(meta: Element): ScriptEntry[] {
-    const root = meta.elements?.[0];
+    const root = getRootElement(meta);
 
     if (!root?.elements) {
       return [];
@@ -77,13 +77,13 @@ export class MetaXmlService {
       scriptsByElement.set(script.element, elementScripts);
     }
 
-    const root = meta.elements?.[0];
+    const root = getRootElement(meta);
     if (!root?.elements) {
       return js2xml(meta, { spaces: "\t" });
     }
 
     const emittedScripts = new Set<string>();
-    root.elements = root.elements.flatMap((element) => {
+    root.elements = root.elements.flatMap((element, elementIndex) => {
       if (element.type !== "element" || element.name !== "script") {
         return [element];
       }
@@ -93,7 +93,7 @@ export class MetaXmlService {
         return [element];
       }
 
-      return elementScripts.flatMap((script) => {
+      const renderedScripts = elementScripts.flatMap((script) => {
         const outputName = outputBySource.get(normalize(script.sourcePath));
         if (!outputName) {
           return [];
@@ -115,9 +115,20 @@ export class MetaXmlService {
           },
         ];
       });
+
+      if (renderedScripts.length < 2) {
+        return renderedScripts;
+      }
+
+      const separator = getElementSeparator(root.elements, elementIndex);
+      if (!separator) {
+        return renderedScripts;
+      }
+
+      return renderedScripts.flatMap((script, index) => (index === 0 ? [script] : [{ type: "text", text: separator }, script]));
     });
 
-    return js2xml(meta, { spaces: "\t" });
+    return js2xml(meta);
   }
 
   private async resolvePattern(pattern: string, resourceRoot: string): Promise<string[]> {
@@ -162,6 +173,24 @@ export class MetaXmlService {
       return true;
     });
   }
+}
+
+function getRootElement(meta: Element): Element | undefined {
+  return meta.elements?.find((element) => element.type === "element");
+}
+
+function getElementSeparator(elements: Element[], elementIndex: number): string {
+  const nextElement = elements[elementIndex + 1];
+  if (nextElement?.type === "text") {
+    return typeof nextElement.text === "string" ? nextElement.text : "";
+  }
+
+  const previousElement = elements[elementIndex - 1];
+  if (previousElement?.type === "text") {
+    return typeof previousElement.text === "string" ? previousElement.text : "";
+  }
+
+  return "";
 }
 
 export function normalize(filePath: string): string {

@@ -9,7 +9,7 @@ MTA Resource Lua Compiler compiles Lua scripts declared by an MTA resource using
 - Expands wildcard entries such as `**/*` and ignores XML comments.
 - Writes every compiled script and a converted `meta.xml` directly inside `_compiled`.
 - Supports compiling an entire resource, a folder, or one or more selected Lua files.
-- Uses `compile: 1`, `debug: 0`, and `obfuscate: 3` when calling the MTA API.
+- Uses the bundled MTA compiler locally on Windows and Linux to avoid one network request per file. The online API is used as a fallback on unsupported platforms.
 
 Compiled files keep their original file name and use the `.luac` extension. If source files have the same name, the relative path is added to the output name to prevent collisions.
 
@@ -33,4 +33,4 @@ Install the extension from the [Visual Studio Marketplace](https://marketplace.v
 
 ## Disclaimer
 
-Source files are sent directly to the MTA API for compilation and are not stored by this extension. Review the [source code](https://github.com/guibzo/mtasa-compiler) before use.
+On supported platforms, source files are compiled locally with the bundled MTA compiler. Unsupported platforms use the MTA API as a fallback. Review the [source code](https://github.com/guibzo/mtasa-compiler) before use.
