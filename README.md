@@ -11,7 +11,7 @@ MTA Resource Lua Compiler compiles Lua scripts declared by an MTA resource using
 - Supports compiling an entire resource, a folder, or one or more selected Lua files.
 - Uses `compile: 1`, `debug: 0`, and `obfuscate: 3` when calling the MTA API.
 
-Compiled files keep their original file name and use the `.luac` extension. Since all output files share one directory, compilation fails if two source files would produce the same output name.
+Compiled files keep their original file name and use the `.luac` extension. If source files have the same name, the relative path is added to the output name to prevent collisions.
 
 ## Usage
 

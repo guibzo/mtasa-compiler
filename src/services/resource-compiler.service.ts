@@ -28,7 +28,7 @@ export class ResourceCompilerService {
       throw new Error("No Lua scripts from meta.xml matched the selected resources.");
     }
 
-    const compiledScripts = this.createCompiledScripts(scripts);
+    const compiledScripts = this.createCompiledScripts(resourceRoot, scripts);
     const outputDirectory = path.join(resourceRoot, "_compiled");
 
     await this.fileService.remove(outputDirectory);
@@ -49,24 +49,18 @@ export class ResourceCompilerService {
     return compiledScripts.length;
   }
 
-  private createCompiledScripts(scripts: ResolvedScript[]): CompiledScript[] {
+  private createCompiledScripts(resourceRoot: string, scripts: ResolvedScript[]): CompiledScript[] {
     const uniqueScripts = new Map<string, ResolvedScript>();
     for (const script of scripts) {
       uniqueScripts.set(normalize(script.sourcePath), script);
     }
 
-    const outputNames = new Map<string, string>();
+    const usedOutputNames = new Set<string>();
     const compiledScripts: CompiledScript[] = [];
 
     for (const script of uniqueScripts.values()) {
-      const outputName = `${path.basename(script.sourcePath, path.extname(script.sourcePath))}.luac`;
-      const previousSource = outputNames.get(outputName.toLowerCase());
-
-      if (previousSource && normalize(previousSource) !== normalize(script.sourcePath)) {
-        throw new Error(`Cannot compile resources with duplicate output name: ${outputName}`);
-      }
-
-      outputNames.set(outputName.toLowerCase(), script.sourcePath);
+      const outputName = createOutputName(resourceRoot, script.sourcePath, usedOutputNames);
+      usedOutputNames.add(outputName.toLowerCase());
       compiledScripts.push({
         sourcePath: script.sourcePath,
         outputName,
@@ -75,6 +69,27 @@ export class ResourceCompilerService {
 
     return compiledScripts;
   }
+}
+
+function createOutputName(resourceRoot: string, sourcePath: string, usedOutputNames: Set<string>): string {
+  const extension = path.extname(sourcePath);
+  const baseName = `${path.basename(sourcePath, extension)}.luac`;
+
+  if (!usedOutputNames.has(baseName.toLowerCase())) {
+    return baseName;
+  }
+
+  const relativePath = path.relative(resourceRoot, sourcePath).slice(0, -extension.length);
+  const flattenedPath = relativePath.replace(/[\\/]+/g, "_").replace(/[<>:"|?*]/g, "_");
+  let outputName = `${flattenedPath}.luac`;
+  let suffix = 2;
+
+  while (usedOutputNames.has(outputName.toLowerCase())) {
+    outputName = `${flattenedPath}-${suffix}.luac`;
+    suffix += 1;
+  }
+
+  return outputName;
 }
 
 function isSelected(sourcePath: string, selectedPath: string): boolean {
