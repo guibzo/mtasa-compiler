@@ -34,13 +34,25 @@ export class ResourceCompilerService {
     await this.fileService.remove(outputDirectory);
     await this.fileService.createDirectory(outputDirectory);
 
-    for (let index = 0; index < compiledScripts.length; index += 1) {
-      const script = compiledScripts[index];
-      const source = await this.fileService.readText(script.sourcePath);
-      const compiled = await this.compilerService.compile(source);
-      await this.fileService.writeFile(path.join(outputDirectory, script.outputName), compiled);
-      onProgress?.(`Compiled ${path.basename(script.sourcePath)}`, index + 1, compiledScripts.length);
-    }
+    let nextScriptIndex = 0;
+    let completedScripts = 0;
+    const workerCount = this.compilerService.usesLocalCompiler ? Math.min(4, compiledScripts.length) : 1;
+
+    const compileNextScript = async (): Promise<void> => {
+      while (nextScriptIndex < compiledScripts.length) {
+        const script = compiledScripts[nextScriptIndex];
+        nextScriptIndex += 1;
+
+        const source = await this.fileService.readText(script.sourcePath);
+        const compiled = await this.compilerService.compile(source);
+        await this.fileService.writeFile(path.join(outputDirectory, script.outputName), compiled);
+
+        completedScripts += 1;
+        onProgress?.(`Compiled ${path.basename(script.sourcePath)}`, completedScripts, compiledScripts.length);
+      }
+    };
+
+    await Promise.all(Array.from({ length: workerCount }, () => compileNextScript()));
 
     const compiledMeta = this.metaXmlService.renderCompiledMeta(meta, resolvedScripts, compiledScripts);
     await this.fileService.writeFile(path.join(outputDirectory, "meta.xml"), Buffer.from(compiledMeta, "utf8"));

@@ -10,6 +10,10 @@ const executeFile = promisify(execFile);
 export class CompilerService {
   constructor(private readonly localCompilerPath?: string) {}
 
+  get usesLocalCompiler(): boolean {
+    return Boolean(this.localCompilerPath);
+  }
+
   async compile(source: string): Promise<Buffer> {
     if (this.localCompilerPath && (await fileExists(this.localCompilerPath))) {
       return this.compileLocally(source);
